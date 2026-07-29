@@ -1,6 +1,7 @@
 const express = require("express");
 
 const app = express();
+const cros = require("cors");
 
 let todoArr = ["go to university"];
 
@@ -20,8 +21,11 @@ function updateTodo(oldTodo, newTodo) {
 
 // extract json from body and parse in original js object
 app.use(express.json());
+app.use(cros());
 
 app.get("/todo", (req, resp) => {
+  console.log();
+  
   resp.json({
     data: todoArr,
   });
@@ -32,7 +36,7 @@ app.post("/todo", (req, resp) => {
   // console.log(req.body);
 
   todoArr.push(data);
-  console.log(todoArr);
+  // console.log(todoArr);
 
   resp.json({
     message: "Todo recieved and added successfully",
