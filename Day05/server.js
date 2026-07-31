@@ -77,6 +77,26 @@ function generateToken() {
   return token;
 }
 
+function authMiddleware(req, res, next) {
+  const { token } = req.headers;
+
+  let foundUser = null;
+
+  foundUser = users.find((user) => {
+    if (user.token == token) {
+      return true;
+    }
+  });
+  if (foundUser) {
+    req.user = foundUser;
+    next();
+  } else {
+    res.json({
+      msg: "not allowed to access protected data",
+    });
+  }
+}
+
 app.post("/signup", (req, res) => {
   const { email, password, username } = req.body;
 
@@ -118,6 +138,23 @@ app.post("/signin", (req, res) => {
     });
   }
 });
+
+app.use(authMiddleware);
+
+app.get("/me", (req, res) => {
+  const founderUser = req.user;
+
+  res.json({
+    data: founderUser,
+  });
+});
+
+app.get("/menu", () => {
+  res.json({
+    data: "secret data",
+  });
+});
+
 const PORT = 8080;
 app.listen(PORT, () => {
   console.log(`"server is listening at ${PORT}......."`);
