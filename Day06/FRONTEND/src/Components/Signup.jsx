@@ -35,39 +35,40 @@ const Signup = () => {
     }
   }
   return (
-    <div>
-      <h1>SIGNUP</h1>
+    <div className="auth-block">
+      <h1 className="auth-title">SIGNUP</h1>
       <input
+        className="auth-input"
         type="text"
         placeholder="Username"
         onChange={(e) => {
           setUsername(e.target.value);
         }}
       />
-      <br></br>
       <input
+        className="auth-input"
         type="email"
         placeholder="Email"
         onChange={(e) => {
           setEmail(e.target.value);
         }}
       />
-      <br></br>
       <input
+        className="auth-input"
         type="password"
         placeholder="Password"
         onChange={(e) => {
           setPassword(e.target.value);
         }}
       />
-      <br></br>
 
       <button
+        className="auth-button"
         onClick={(e) => {
           handleUserRegister(e);
         }}
       >
-        Sign UP
+        Sign Up
       </button>
     </div>
   );

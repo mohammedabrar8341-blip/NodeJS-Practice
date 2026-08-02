@@ -42,26 +42,27 @@ const Signin = () => {
   }
 
   return (
-    <div>
-      <h1>SIGNIN</h1>
+    <div className="auth-block">
+      <h1 className="auth-title">SIGNIN</h1>
 
       <input
+        className="auth-input"
         type="email"
         placeholder="Enter your Email"
         onChange={(e) => {
           setEmail(e.target.value);
         }}
       />
-      <br></br>
       <input
+        className="auth-input"
         type="password"
         placeholder="Enter your Password"
         onChange={(e) => {
           setPassword(e.target.value);
         }}
       />
-      <br></br>
       <button
+        className="auth-button"
         onClick={(e) => {
           handleUserRegister(e);
         }}

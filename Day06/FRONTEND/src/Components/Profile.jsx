@@ -27,18 +27,25 @@ const ProfileUser = () => {
     alert("Logged out successfully");
   };
 
-  return (
-    <div>
-      <h2>Profile</h2>
-      <button onClick={fetchProfile}>Fetch Profile</button>
-      <button onClick={handleLogout}>Logout</button>
+  const hasToken = !!localStorage.getItem("token");
 
-      {profileData && profileData.data ? (
-        <div>
+  return (
+    <div className="profile-block">
+      <h2 className="profile-title">Profile</h2>
+
+      <div className="profile-actions">
+        <button className="profile-button" onClick={fetchProfile}>Fetch Profile</button>
+        <button className="profile-button" onClick={handleLogout}>Logout</button>
+      </div>
+
+      {!hasToken ? (
+        <div className="profile-message">Please sign in first</div>
+      ) : profileData && profileData.data ? (
+        <div className="profile-info">
           {profileData.data.username}, {profileData.data.email}
         </div>
       ) : (
-        <div>loading......</div>
+        <div className="profile-message">loading......</div>
       )}
     </div>
   );
