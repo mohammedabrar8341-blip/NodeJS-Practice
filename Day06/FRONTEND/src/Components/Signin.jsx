@@ -7,14 +7,30 @@ const Signin = () => {
 
   async function handleUserRegister(e) {
     e.preventDefault();
-    console.log("Submitting login from:", email, password);
+
+    const trimmedEmail = email.trim();
+    const trimmedPassword = password.trim();
+
+    if (!trimmedEmail || !trimmedPassword) {
+      alert("Please enter both email and password.");
+      return;
+    }
+
+    console.log("Submitting login from:", { email: trimmedEmail, password: trimmedPassword });
 
     try {
       const response = await axios.post("http://localhost:8080/signin", {
-        email,
-        password,
+        email: trimmedEmail,
+        password: trimmedPassword,
       });
       console.log("Success", response.data);
+
+      if (!response.data.token) {
+        alert(response.data.msg || "Login fail!try again");
+        return;
+      }
+
+      localStorage.setItem("token", response.data.token);
       alert("Login Successfully!");
 
       // Tip: You can save your JWT token here if your backend returns one:
