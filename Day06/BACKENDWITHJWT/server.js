@@ -1,11 +1,25 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
+const cors = require("cors");
 
 const app = express();
 const JWT_SECRET = "I AM ALIVE";
-
-app.use(express.json());
 let users = [];
+app.use(express.json());
+app.use(cors());
+
+const authMiddleware = (req, res, next) => {
+  const { token } = req.headers;
+  const payLoad = jwt.verify(token, JWT_SECRET);
+
+  if (payLoad == undefined) {
+    res.json({
+      msg: "invalid credentials / you are not allowed to access this data",
+    });
+  }
+  req.transferData = payLoad;
+  next();
+};
 
 app.post("/signup", (req, res) => {
   const { username, email, password } = req.body;
@@ -46,16 +60,10 @@ app.post("/signin", (req, res) => {
     });
   }
 });
+app.use(authMiddleware);
 app.get("/me", (req, res) => {
-  const { token } = req.headers;
+  const payLoad = req.transferData;
 
-  const payLoad = jwt.verify(token, JWT_SECRET);
-
-  if (payLoad == undefined) {
-    res.json({
-      msg: "invalid credentials / you are not allowed to access this data",
-    });
-  }
   const verifedUser = users.find((userObject) => {
     if (userObject.username == payLoad.username) {
       return true;
