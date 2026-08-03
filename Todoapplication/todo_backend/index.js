@@ -1,9 +1,33 @@
 const express = require("express");
+const fs = require("fs");
+const path = require("path");
 
+const jwt = require("jsonwebtoken");
+
+const JWT_SECRET = "I AM ALIVE";
+
+const filePath = path.join(__dirname, "todo.json");
+const jsonData = fs.readFileSync(filePath, "utf-8");
+const todoArr = JSON.parse(jsonData);
+
+let users = [];
 const app = express();
 const cros = require("cors");
+app.use(express.json());
+app.use(cros());
 
-let todoArr = ["go to university"];
+
+const authenticate = (req, res, next) => {
+  const { token } = req.headers;
+  const payload = jwt.verify(token, JWT_SECRET);
+  if (!payload) {
+    return res.json({
+      message: "Invalid token/Unauthorized access",
+    });
+  }
+  req.transaction = payload;
+  next();
+};
 
 function updateTodo(oldTodo, newTodo) {
   let index;
@@ -19,15 +43,52 @@ function updateTodo(oldTodo, newTodo) {
   todoArr = filteredArray;
 }
 
-// extract json from body and parse in original js object
-app.use(express.json());
-app.use(cros());
-
-app.get("/todo", (req, resp) => {
-  console.log();
-  
+app.post("/signup", (req, resp) => {
+  const { username, password, email } = req.body;
+  const userData = {
+    username,
+    password,
+    email,
+  };
+  users.push(userData);
   resp.json({
-    data: todoArr,
+    message: "User signed up successfully",
+    data: userData,
+  });
+});
+
+app.post("/signin", (req, resp) => {
+  const { email, password } = req.body;
+
+  let filterUser = users.find((userobj) => {
+    return userobj.email === email && userobj.password === password;
+  });
+
+  if (!filterUser) {
+    return resp.json({
+      msg: "Invalid user credentials",
+    });
+  }
+
+  const token = jwt.sign({ username: filterUser.username }, JWT_SECRET);
+
+  resp.json({
+    token,
+  });
+});
+
+app.use(authenticate);
+app.get("/todo", (req, resp) => {
+  const payload = req.transaction;
+
+  const VerifiedUser = users.find((userobj) => {
+    if (userobj.username === payload.username) {
+      return true;
+    }
+  });
+  resp.json({
+    message: "You'r eligible to access data",
+    data: VerifiedUser,
   });
 });
 

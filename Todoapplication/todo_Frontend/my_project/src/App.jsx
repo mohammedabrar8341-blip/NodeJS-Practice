@@ -1,10 +1,11 @@
 import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "./assets/vite.svg";
-import heroImg from "./assets/hero.png";
+
 import "./App.css";
 import useFetchTodo from "../../utlies/UseFetchTodo";
 import TodoBox from "./assets/TodoBox";
+import Signup from "./Components/Signup";
+import Signin from "./Components/Signin";
+
 function App() {
   const [input, setInput] = useState("");
 
@@ -52,6 +53,8 @@ function App() {
       {todoList.map((todo, index) => {
         return <TodoBox details={todo} key={index} />;
       })}
+      <Signup/>
+      <Signin />
     </div>
   );
 }
