@@ -1,32 +1,40 @@
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
-
 const jwt = require("jsonwebtoken");
+const cors = require("cors");
 
 const JWT_SECRET = "I AM ALIVE";
 
 const filePath = path.join(__dirname, "todo.json");
 const jsonData = fs.readFileSync(filePath, "utf-8");
-const todoArr = JSON.parse(jsonData);
+let todoArr = JSON.parse(jsonData);
 
 let users = [];
 const app = express();
-const cros = require("cors");
-app.use(express.json());
-app.use(cros());
 
+app.use(express.json());
+app.use(cors());
 
 const authenticate = (req, res, next) => {
-  const { token } = req.headers;
-  const payload = jwt.verify(token, JWT_SECRET);
-  if (!payload) {
-    return res.json({
+  const token =
+    req.headers.token || req.headers.authorization?.replace("Bearer ", "");
+
+  if (!token) {
+    return res.status(401).json({
+      message: "Unauthorized access. Please login first.",
+    });
+  }
+
+  try {
+    const payload = jwt.verify(token, JWT_SECRET);
+    req.transaction = payload;
+    next();
+  } catch (error) {
+    return res.status(401).json({
       message: "Invalid token/Unauthorized access",
     });
   }
-  req.transaction = payload;
-  next();
 };
 
 function updateTodo(oldTodo, newTodo) {
@@ -77,53 +85,52 @@ app.post("/signin", (req, resp) => {
   });
 });
 
-app.use(authenticate);
-app.get("/todo", (req, resp) => {
+app.get("/todo", authenticate, (req, resp) => {
   const payload = req.transaction;
 
-  const VerifiedUser = users.find((userobj) => {
-    if (userobj.username === payload.username) {
-      return true;
-    }
+  const verifiedUser = users.find((userobj) => {
+    return userobj.username === payload.username;
   });
+
   resp.json({
-    message: "You'r eligible to access data",
-    data: VerifiedUser,
+    message: "You're eligible to access data",
+    data: verifiedUser,
   });
 });
 
-app.post("/todo", (req, resp) => {
+app.post("/todo", authenticate, (req, resp) => {
   const { data } = req.body;
-  // console.log(req.body);
+
+  if (!data) {
+    return resp.status(400).json({
+      message: "Todo data is required",
+    });
+  }
 
   todoArr.push(data);
-  // console.log(todoArr);
 
   resp.json({
-    message: "Todo recieved and added successfully",
+    message: "Todo received and added successfully",
+    data: todoArr,
   });
 });
 
-app.put("/todo", (req, resp) => {
+app.put("/todo", authenticate, (req, resp) => {
   const { oldTodo, newTodo } = req.body;
 
   updateTodo(oldTodo, newTodo);
-  console.log(todoArr);
 
   resp.json({
     message: "todo update successfully",
   });
 });
 
-app.delete("/todo", (req, res) => {
+app.delete("/todo", authenticate, (req, res) => {
   const { todo } = req.body;
   todoArr = todoArr.filter((elem) => {
-    if (elem == todo) {
-      return false;
-    } else {
-      return true;
-    }
+    return elem !== todo;
   });
+
   res.json({
     message: "todo deleted successfully",
   });

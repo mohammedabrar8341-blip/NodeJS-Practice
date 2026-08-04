@@ -1,26 +1,28 @@
 import { useState } from "react";
 import axios from "axios";
 
-const Signup = () => {
+const Signup = ({ onSignupSuccess }) => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   async function handleUserRegister(e) {
     e.preventDefault();
-    console.log("submitting", username, password, email);
 
     try {
-      const response = await axios.post("http://localhost:8080/signup", {
+      await axios.post("http://localhost:8080/signup", {
         username,
         password,
         email,
       });
-      console.log("Success", response.data);
       alert("Registration successful");
+      onSignupSuccess?.();
+      setUsername("");
+      setEmail("");
+      setPassword("");
     } catch (error) {
       console.log("Error", error.response?.data || error.message);
-      alert("Registration fail");
+      alert("Registration failed");
     }
   }
 
