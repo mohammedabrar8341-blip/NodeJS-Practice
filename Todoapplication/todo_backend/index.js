@@ -94,7 +94,10 @@ app.get("/todo", authenticate, (req, resp) => {
 
   resp.json({
     message: "You're eligible to access data",
-    data: verifiedUser,
+    data: {
+      user: verifiedUser,
+      todos: todoArr,
+    },
   });
 });
 
@@ -109,9 +112,17 @@ app.post("/todo", authenticate, (req, resp) => {
 
   todoArr.push(data);
 
+  try {
+    fs.writeFileSync(filePath, JSON.stringify(todoArr, null, 2), "utf-8");
+  } catch (err) {
+    console.error("Failed to persist todos", err);
+  }
+
   resp.json({
     message: "Todo received and added successfully",
-    data: todoArr,
+    data: {
+      todos: todoArr,
+    },
   });
 });
 
@@ -120,8 +131,17 @@ app.put("/todo", authenticate, (req, resp) => {
 
   updateTodo(oldTodo, newTodo);
 
+  try {
+    fs.writeFileSync(filePath, JSON.stringify(todoArr, null, 2), "utf-8");
+  } catch (err) {
+    console.error("Failed to persist todos", err);
+  }
+
   resp.json({
     message: "todo update successfully",
+    data: {
+      todos: todoArr,
+    },
   });
 });
 
@@ -131,8 +151,17 @@ app.delete("/todo", authenticate, (req, res) => {
     return elem !== todo;
   });
 
+  try {
+    fs.writeFileSync(filePath, JSON.stringify(todoArr, null, 2), "utf-8");
+  } catch (err) {
+    console.error("Failed to persist todos", err);
+  }
+
   res.json({
     message: "todo deleted successfully",
+    data: {
+      todos: todoArr,
+    },
   });
 });
 const PORT = 8080;

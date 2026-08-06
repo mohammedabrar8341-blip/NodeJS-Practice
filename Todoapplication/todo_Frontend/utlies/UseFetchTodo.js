@@ -5,9 +5,24 @@ const useFetchTodo = () => {
   const [todoList, setTodoList] = useState([]);
 
   const fetchTodo = async function () {
-    const data = await fetch("http://localhost:8080/todo");
-    const json = await data.json();
-    setTodoList(json.data);
+    try {
+      const token = localStorage.getItem("token") || "";
+      const resp = await fetch("http://localhost:8080/todo", {
+        headers: {
+          token,
+        },
+      });
+
+      if (!resp.ok) {
+        console.error("Fetch todos failed", resp.status);
+        return;
+      }
+
+      const json = await resp.json();
+      setTodoList(json.data?.todos || []);
+    } catch (err) {
+      console.error("Error fetching todos", err);
+    }
   };
   useEffect(() => {
     fetchTodo();

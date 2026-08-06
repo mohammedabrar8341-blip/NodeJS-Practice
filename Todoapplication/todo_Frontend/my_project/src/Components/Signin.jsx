@@ -8,10 +8,17 @@ const Signin = ({ onLoginSuccess }) => {
   async function handleUserLogin(e) {
     e.preventDefault();
 
+    const trimmedEmail=email.trim()
+    const trimmedPassword=password.trim()
+
+    if(!trimmedEmail||!trimmedPassword){
+      alert("Please enter both email and password")
+return
+    }
     try {
       const response = await axios.post("http://localhost:8080/signin", {
-        email,
-        password,
+        email:trimmedEmail,
+        password:trimmedPassword,
       });
 
       if (!response.data.token) {

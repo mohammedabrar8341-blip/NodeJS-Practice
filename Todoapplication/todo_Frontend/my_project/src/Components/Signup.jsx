@@ -9,11 +9,18 @@ const Signup = ({ onSignupSuccess }) => {
   async function handleUserRegister(e) {
     e.preventDefault();
 
+    const trimmedUsername = username.trim();
+    const trimmedEmail = email.trim();
+    const trimmedPassword = password.trim();
+    if (!trimmedEmail || !trimmedUsername || !trimmedPassword) {
+      alert("Please fill in all fields before registering.");
+      return;
+    }
     try {
       await axios.post("http://localhost:8080/signup", {
-        username,
-        password,
-        email,
+        username: trimmedUsername,
+        password: trimmedPassword,
+        email: trimmedEmail,
       });
       alert("Registration successful");
       onSignupSuccess?.();

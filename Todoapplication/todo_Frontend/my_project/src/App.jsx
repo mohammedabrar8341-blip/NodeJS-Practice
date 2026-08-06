@@ -1,16 +1,23 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import "./App.css";
 import TodoBox from "./assets/TodoBox";
 import Signup from "./Components/Signup";
 import Signin from "./Components/Signin";
 import Profile from "./Profile";
+import useFetchTodo from "../../utlies/UseFetchTodo";
 
 function App() {
   const [input, setInput] = useState("");
   const [todoList, setTodoList] = useState([]);
   const [token, setToken] = useState(localStorage.getItem("token") || "");
   const [view, setView] = useState(token ? "loggedIn" : "signup");
+
+  const { todoList: serverTodos, fetchTodo } = useFetchTodo();
+
+  useEffect(() => {
+    setTodoList(serverTodos);
+  }, [serverTodos]);
 
   function handleLoginSuccess(newToken) {
     setToken(newToken);
@@ -34,9 +41,25 @@ function App() {
       alert("Todo cannot be empty.");
       return;
     }
-
-    setTodoList((prev) => [...prev, input.trim()]);
-    setInput("");
+    const newTodo = input.trim();
+    // send to backend then refresh
+    fetch("http://localhost:8080/todo", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        token,
+      },
+      body: JSON.stringify({ data: newTodo }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        // backend returns updated todo array in data.data (as { message, data: { todos } })
+        fetchTodo();
+        setInput("");
+      })
+      .catch((err) => {
+        console.error("Error adding todo", err);
+      });
   }
 
   if (!token) {

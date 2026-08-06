@@ -17,7 +17,7 @@ const Profile = ({ token }) => {
         },
       });
 
-      setProfileData(response.data.data);
+      setProfileData(response.data.data?.user || null);
     } catch (error) {
       console.log("Profile fetch error", error.response?.data || error.message);
       setProfileData(null);
