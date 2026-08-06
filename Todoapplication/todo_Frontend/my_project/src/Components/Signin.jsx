@@ -38,21 +38,28 @@ return
   }
 
   return (
-    <div>
-      <h1>SIGN IN</h1>
-      <input
-        type="email"
-        placeholder="Enter your Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      <input
-        type="password"
-        placeholder="Enter your password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <button onClick={handleUserLogin}>Login</button>
+    <div className="auth-container">
+      <h1 className="auth-title">SIGN IN</h1>
+
+      <form className="auth-form" onSubmit={handleUserLogin}>
+        <input
+          className="auth-input"
+          type="email"
+          placeholder="Enter your Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <input
+          className="auth-input"
+          type="password"
+          placeholder="Enter your password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <button className="auth-btn" type="submit">
+          Login
+        </button>
+      </form>
     </div>
   );
 };

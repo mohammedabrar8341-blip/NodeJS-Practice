@@ -34,28 +34,35 @@ const Signup = ({ onSignupSuccess }) => {
   }
 
   return (
-    <div>
-      <h1>SIGNUP FORM</h1>
+    <div className="auth-container">
+      <h1 className="auth-title">SIGNUP</h1>
 
-      <input
-        type="text"
-        placeholder="Enter your Username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-      />
-      <input
-        type="email"
-        placeholder="Enter your Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      <input
-        type="password"
-        placeholder="Enter your password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <button onClick={handleUserRegister}>Sign up</button>
+      <form className="auth-form" onSubmit={handleUserRegister}>
+        <input
+          className="auth-input"
+          type="text"
+          placeholder="Enter your Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+        <input
+          className="auth-input"
+          type="email"
+          placeholder="Enter your Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <input
+          className="auth-input"
+          type="password"
+          placeholder="Enter your password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <button className="auth-btn" type="submit">
+          Sign up
+        </button>
+      </form>
     </div>
   );
 };

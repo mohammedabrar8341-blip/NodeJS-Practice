@@ -85,23 +85,37 @@ function App() {
   }
 
   return (
-    <div>
-      <button onClick={handleLogout}>Logout</button>
+    <div className="app-container">
+      <button onClick={handleLogout} className="btn">
+        Logout
+      </button>
 
-      <Profile token={token} />
+      <div className="profile">
+        <Profile token={token} />
+      </div>
 
-      <h1>Todo Application</h1>
-      <input
-        type="text"
-        placeholder="Enter Todo value"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-      />
-      <button onClick={submitFun}>Add Todo</button>
+      <div className="app-header">
+        <h1>Todo Application</h1>
+      </div>
 
-      {todoList.map((todo, index) => (
-        <TodoBox details={todo} key={index} />
-      ))}
+      <div className="todo-form">
+        <input
+          className="todo-input"
+          type="text"
+          placeholder="Enter Todo value"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+        />
+        <button className="btn" onClick={submitFun}>
+          Add Todo
+        </button>
+      </div>
+
+      <div className="todo-list">
+        {todoList && todoList.map((todo, index) => (
+          <TodoBox details={todo} key={index} />
+        ))}
+      </div>
     </div>
   );
 }
