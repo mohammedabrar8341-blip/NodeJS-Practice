@@ -51,6 +51,14 @@ app.post("/signin", async (req, res) => {
     });
   }
 });
+
+app.get("/users", async (req, res) => {
+  const response = await UserModel.find();
+  res.json({
+    msg: "All users",
+    response,
+  });
+});
 app.listen(8080, () => {
   console.log("Server is listening.......");
 });
