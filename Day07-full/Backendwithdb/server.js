@@ -1,6 +1,6 @@
 const dns = require("dns");
 dns.setServers(["8.8.8.8", "1.1.1.1"]);
-// const cors = require("cors");
+const cors = require("cors");
 const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
@@ -14,8 +14,7 @@ mongoose.connect(process.env.DATA_URL);
 
 const app = express();
 app.use(express.json());
-
-// app.use(cors());
+app.use(cors());
 
 app.post("/signup", async (req, res) => {
   const { username, email, password } = req.body;
@@ -94,32 +93,61 @@ app.post("/todo", async (req, res) => {
 });
 
 app.put("/todo", async (req, res) => {
-  userId = req.userId;
-  const { title, description, isDone } = req.body;
+  try {
+    const userId = req.userId;
+    const { id, title, description, isDone } = req.body;
 
-  const feedback = await TodoModel.findOneAndReplace(
-    { title: title, userId: userId },
-    { title, description, isDone, userId },
-    { new: true },
-  );
-  res.json({
-    msg: "todo updated successfully",
-    feedback,
-  });
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ msg: "Valid todo id is required" });
+    }
+
+    const feedback = await TodoModel.findOneAndUpdate(
+      { _id: id, userId },
+      { title, description, isDone, userId },
+      { new: true },
+    );
+
+    if (!feedback) {
+      return res.status(404).json({ msg: "Todo not found" });
+    }
+
+    return res.json({
+      msg: "todo updated successfully",
+      feedback,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ msg: "Server error while updating todo" });
+  }
 });
 
-app.delete("/todo",async(req,res)=>{
-  userId = req.userId;
-  const { title } = req.query.title;
+app.delete("/todo", async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { id } = req.query;
 
-  const feedback=await TodoModel.findByIdAndDelete({
-    title,userId
-  })
-  res.json({
-    msg:"todo deleted successfully",
-    feedback
-  })
-})
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ msg: "Valid todo id is required" });
+    }
+
+    const feedback = await TodoModel.findOneAndDelete({
+      _id: id,
+      userId,
+    });
+
+    if (!feedback) {
+      return res.status(404).json({ msg: "Todo not found" });
+    }
+
+    return res.json({
+      msg: "todo deleted successfully",
+      feedback,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ msg: "Server error while deleting todo" });
+  }
+});
 app.listen(8080, () => {
   console.log("Server is listening...........");
 });
