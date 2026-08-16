@@ -53,37 +53,40 @@ const Signup = () => {
   }
 
   return (
-    <div>
-      <h1>SIGNUP FORM</h1>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Enter your username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-        <br />
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <br />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <br />
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        <button type="submit">Sign Up</button>
-      </form>
+    <div className="auth-page">
+      <div className="auth-card">
+        <h1>SIGNUP FORM</h1>
+        <form className="auth-form" onSubmit={handleSubmit}>
+          <input
+            className="auth-input"
+            type="text"
+            placeholder="Enter your username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+          <input
+            className="auth-input"
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <input
+            className="auth-input"
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          {error && <p className="auth-error">{error}</p>}
+          <button className="auth-btn" type="submit">Sign Up</button>
+        </form>
 
-      <p>
-        Already have an account? <button type="button" onClick={() => navigate("/signin")}>Sign In</button>
-      </p>
+        <div className="auth-footer">
+          <span>Already have an account?</span>
+          <button className="link-btn" type="button" onClick={() => navigate("/signin")}>Sign In</button>
+        </div>
+      </div>
     </div>
   );
 };

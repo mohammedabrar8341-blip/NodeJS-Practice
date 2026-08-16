@@ -28,28 +28,35 @@ const Signin = () => {
   };
 
   return (
-    <div>
-      <h1>SIGNIN PAGE</h1>
-      <div>
-        <input
-          onChange={(e) => {
-            setEmail(e.target.value);
-          }}
-          type="text"
-          placeholder="Enter email"
-          value={email}
-        />
-        <br />
-        <input
-          onChange={(e) => {
-            setPassword(e.target.value);
-          }}
-          type="password"
-          placeholder="Enter password"
-          value={password}
-        />
-        <br />
-        <button onClick={signin}>SignIn</button>
+    <div className="auth-page">
+      <div className="auth-card">
+        <h1>SIGN IN</h1>
+        <div className="auth-form">
+          <input
+            className="auth-input"
+            onChange={(e) => {
+              setEmail(e.target.value);
+            }}
+            type="text"
+            placeholder="Enter email"
+            value={email}
+          />
+          <input
+            className="auth-input"
+            onChange={(e) => {
+              setPassword(e.target.value);
+            }}
+            type="password"
+            placeholder="Enter password"
+            value={password}
+          />
+          <button className="auth-btn" onClick={signin}>Sign In</button>
+        </div>
+
+        <div className="auth-footer">
+          <span>Need an account?</span>
+          <button className="link-btn" type="button" onClick={() => navigate("/signup")}>Create one</button>
+        </div>
       </div>
     </div>
   );
