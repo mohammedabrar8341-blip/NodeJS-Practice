@@ -6,6 +6,8 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+const z = require("zod");
 
 const { TodoModel, UserModel } = require("./utlis/db");
 const authMiddleware = require("./Middleware/Auth");
@@ -17,39 +19,69 @@ app.use(express.json());
 app.use(cors());
 
 app.post("/signup", async (req, res) => {
-  const { username, email, password } = req.body;
+  const requiredBodySchema = z.object({
+    email: z.string().email().min(5).max(50),
+    password: z.string().min(8).max(12),
+    username: z.string().min(3).max(15),
+  });
 
-  const feedback = await UserModel.create({ username, email, password });
-  res.status(200).json({
+  const parsedData = requiredBodySchema.safeParse(req.body);
+  if (!parsedData.success) {
+    return res.status(400).json({
+      msg: "Invalid format",
+      error: parsedData.error.flatten(),
+    });
+  }
+
+  const { username, email, password } = parsedData.data;
+
+  const existingUser = await UserModel.findOne({ email });
+  if (existingUser) {
+    return res.status(409).json({
+      msg: "User already exists",
+    });
+  }
+
+  const hashPassword = await bcrypt.hash(password, 5);
+
+  const feedback = await UserModel.create({
+    username,
+    email,
+    password: hashPassword,
+  });
+
+  return res.status(200).json({
     msg: "User created successfully",
-    feedback: feedback,
+    feedback,
   });
 });
 
 app.post("/signin", async (req, res) => {
   const { email, password } = req.body;
 
-  //db call and verify for these email and password
-  const response = await UserModel.findOne({
-    email,
-    password,
-  });
-  if (response) {
-    // token generate
-    const token = jwt.sign(
-      { id: response._id.toString() },
-      process.env.JWT_SECRET,
-    );
-
-    res.status(200).json({
-      msg: "User logged in successfully",
-      token: token,
-    });
-  } else {
-    res.status(401).json({
+  const response = await UserModel.findOne({ email });
+  if (!response) {
+    return res.status(401).json({
       msg: "Invalid email or password",
     });
   }
+
+  const isPasswordValid = await bcrypt.compare(password, response.password);
+  if (!isPasswordValid) {
+    return res.status(401).json({
+      msg: "Invalid email or password",
+    });
+  }
+
+  const token = jwt.sign(
+    { id: response._id.toString() },
+    process.env.JWT_SECRET,
+  );
+
+  return res.status(200).json({
+    msg: "User logged in successfully",
+    token,
+  });
 });
 
 app.use(authMiddleware);

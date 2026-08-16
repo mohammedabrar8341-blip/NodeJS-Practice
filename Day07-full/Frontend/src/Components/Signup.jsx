@@ -7,21 +7,48 @@ const Signup = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const validateSignup = () => {
+    if (username.trim().length < 3 || username.trim().length > 15) {
+      return "Username must be between 3 and 15 characters.";
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return "Email is invalid.";
+    }
+
+    if (password.length < 8 || password.length > 12) {
+      return "Password must be between 8 and 12 characters.";
+    }
+
+    return "";
+  };
 
   async function handleSubmit(e) {
     e.preventDefault();
-    // Handle form submission logic here
+
+    const validationError = validateSignup();
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
     try {
-      await axios.post("http://localhost:8080/signup", {
-        username,
-        email,
+      const response = await axios.post("http://localhost:8080/signup", {
+        username: username.trim(),
+        email: email.trim(),
         password,
       });
-      alert("Signup successful!");
+
+      setError("");
+      alert(response?.data?.msg || "Signup successful!");
       navigate("/signin");
     } catch (error) {
       console.error("Error signing up:", error);
-      alert("Signup failed. Please try again.");
+      const msg = error?.response?.data?.msg || "Signup failed. Please try again.";
+      setError(msg);
+      alert(msg);
     }
   }
 
@@ -50,6 +77,7 @@ const Signup = () => {
           onChange={(e) => setPassword(e.target.value)}
         />
         <br />
+        {error && <p style={{ color: "red" }}>{error}</p>}
         <button type="submit">Sign Up</button>
       </form>
 
